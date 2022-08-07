@@ -26,6 +26,8 @@ const Tetris = Object.create(null);
  * @property {Tetris.Tetromino} next_tetromino The next piece to descend.
  * @property {number[]} position Where in the field is the current tetromino.
  * @property {Tetris.Score} score Information relating to the score of the game.
+ * @property {Tetris.Tetromino} held_tetromino The tetromino that is held.
+ * @property {boolean} can_hold Whether a piece can be held.
  */
 
 /**
@@ -297,7 +299,6 @@ const new_score = () => 0;
 Tetris.new_game = function () {
     const [current_tetromino, next_bag] = new_bag();
     const [next_tetromino, bag] = next_bag();
-
     return {
         "bag": bag,
         "current_tetromino": current_tetromino,
@@ -305,7 +306,9 @@ Tetris.new_game = function () {
         "game_over": false,
         "next_tetromino": next_tetromino,
         "position": starting_position,
-        "score": new_score()
+        "score": new_score(),
+        "held_tetromino": null,
+        "can_hold": true
     };
 };
 
@@ -551,6 +554,38 @@ const clear_lines = R.pipe(
     pad_field
 );
 
+Tetris.hold = function(game) {
+    if (game.game_over) {
+        return game;
+    }
+
+    if (game.can_hold == false){
+        return game;
+    }
+
+    const [next_tetromino, bag] = game.bag();
+    let piece = null;
+    let piece2 = null;
+
+    if (game.held_tetromino != null){
+        piece = game.held_tetromino;
+    } else {
+        piece = game.next_tetromino;
+    }
+
+    return {
+        "bag": bag,
+        "current_tetromino": piece,//Change after if statement written, this one is either the next or the one I put in
+        "field": game.field,
+        "game_over": false,
+        "next_tetromino": next_tetromino,
+        "position": game.position,
+        "score": game.score,
+        "held_tetromino": game.current_tetromino,//Takes the piece on field into hold
+        "can_hold": false//False to lock further holding which would allow multiple switching of the pieces
+    };
+}
+
 /**
  * next_turn advances the Tetris game.
  * It will attempt to descent the current tetromino once.
@@ -594,7 +629,9 @@ Tetris.next_turn = function (game) {
         "game_over": false,
         "next_tetromino": next_tetromino,
         "position": starting_position,
-        "score": game.score
+        "score": game.score,
+        "held_tetromino": game.held_tetromino,
+        "can_hold": true
     };
 };
 

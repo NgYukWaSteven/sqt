@@ -33,15 +33,34 @@ describe("Hold", function () {
         When one further Hold is performed;
         Then the game state before and after the second hold, is the same.`,
         function () {
-            const initial_game = Tetris.hold(Tetris.new_game());
-            // Implement the rest of this function.
+            const initial_game = Tetris.hold(Tetris.new_game());//Initial game where hold is performed once already.
+            const initial_held_piece = initial_game.held_tetromino;//Initial held piece
+            const final_game = Tetris.hold(initial_game);
+            const final_held_piece = final_game.held_tetromino;
+
+            if (!R.equals(initial_held_piece, final_held_piece)) {
+                throw new Error(
+                    `Hold can be performed more than once in a single turn, which shouldn't be allowed.
+                    Initial: ${JSON.stringify(initial_held_piece)}
+                    Final: ${JSON.stringify(final_held_piece)}`
+                )
+            }
+
+            
         }
     );
 
     it(
         `### Change this to your test description ###`,
         function () {
-            // Implement this function.
+            const initial_game = Tetris.new_game();
+            const final_game = Tetris.hold(initial_game);
+
+            if (final_game.current_tetromino != initial_game.next_tetromino){
+                throw new Error(
+                    `Next tetromino should be deployed when hold is performed given no tetromino is held`
+                )
+            }
         }
     );
 });
